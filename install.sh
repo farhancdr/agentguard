@@ -468,6 +468,7 @@ install_cursor() {
 # Our hook filenames — used to identify which files to remove
 AGENTGUARD_HOOKS=(
   audit-log.sh
+  block-aws.sh
   block-destructive-ops.sh
   block-env-read.sh
   block-env.sh
@@ -642,6 +643,7 @@ uninstall_codex() {
 CURSOR_AGENTGUARD_FILES=(
   ".cursor/hooks.json"
   ".cursor/hooks/audit-log.sh"
+  ".cursor/hooks/block-aws.sh"
   ".cursor/hooks/block-destructive-ops.sh"
   ".cursor/hooks/block-env-read.sh"
   ".cursor/hooks/block-env.sh"

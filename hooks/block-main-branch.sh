@@ -8,7 +8,7 @@
 # 3. Blocks explicit pushes targeting protected branches regardless of current branch,
 #    including refspec-style pushes (HEAD:main, refs/heads/main).
 #
-# Protected branches: defaults to main and master. Override by setting
+# Protected branches: defaults to main, master, dev, staging, production. Override by setting
 # AGENTGUARD_PROTECTED_BRANCHES to a comma-separated list, e.g.:
 #   export AGENTGUARD_PROTECTED_BRANCHES="main,master,develop,trunk"
 #
@@ -48,8 +48,8 @@ if echo "$COMMAND" | grep -qE "${_GIT_STMT}push.*[[:space:]](-f|--force|--force-
 fi
 
 # Build the protected-branch regex from AGENTGUARD_PROTECTED_BRANCHES (comma-separated).
-# Default: main,master
-_raw="${AGENTGUARD_PROTECTED_BRANCHES:-main,master}"
+# Default: main,master,dev,staging,production
+_raw="${AGENTGUARD_PROTECTED_BRANCHES:-main,master,dev,staging,production}"
 # Convert comma-separated list to a safe alternation regex:
 #   1. Split on commas, strip whitespace, drop empty entries.
 #   2. Escape regex metacharacters so "feat.*" in the env var doesn't accidentally

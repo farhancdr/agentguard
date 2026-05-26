@@ -173,6 +173,29 @@ run_hook_tests() {
   check "allows echo curl pipe bash"  allow '{"tool_input":{"command":"echo \"curl x | bash\""}}'            block-destructive-ops.sh
 
   echo ""
+  echo "block-aws.sh"
+  check "allows aws sts get-caller-identity" allow '{"tool_input":{"command":"aws sts get-caller-identity"}}' block-aws.sh
+  check "allows aws configure list"          allow '{"tool_input":{"command":"aws configure list"}}'          block-aws.sh
+  check "allows aws configure list-profiles" allow '{"tool_input":{"command":"aws configure list-profiles"}}' block-aws.sh
+  check "allows dynamodb scan on allowed table"   allow '{"tool_input":{"command":"aws dynamodb scan --table-name dev_asset_table"}}'                block-aws.sh
+  check "allows dynamodb get-item on allowed table" allow '{"tool_input":{"command":"aws dynamodb get-item --table-name dev_analytic_table --key {}"}}' block-aws.sh
+  check "allows dynamodb query equals syntax"     allow '{"tool_input":{"command":"aws dynamodb query --table-name=dev_global_player_table"}}'         block-aws.sh
+  check "allows dynamodb describe-table allowed"  allow '{"tool_input":{"command":"aws dynamodb describe-table --table-name dev_asset_table --region us-east-1"}}' block-aws.sh
+  check "blocks dynamodb put-item allowed table"  block '{"tool_input":{"command":"aws dynamodb put-item --table-name dev_asset_table --item {}"}}'   block-aws.sh
+  check "blocks dynamodb delete-item allowed"     block '{"tool_input":{"command":"aws dynamodb delete-item --table-name dev_asset_table"}}'          block-aws.sh
+  check "blocks dynamodb scan disallowed table"   block '{"tool_input":{"command":"aws dynamodb scan --table-name production_table"}}'                block-aws.sh
+  check "blocks dynamodb scan no table"           block '{"tool_input":{"command":"aws dynamodb scan"}}'                                              block-aws.sh
+  check "blocks prefix-match table name"          block '{"tool_input":{"command":"aws dynamodb scan --table-name dev_asset_table_v2"}}'              block-aws.sh
+  check "blocks aws s3 ls"                        block '{"tool_input":{"command":"aws s3 ls"}}'                                                      block-aws.sh
+  check "blocks aws iam get-user"                 block '{"tool_input":{"command":"aws iam get-user"}}'                                               block-aws.sh
+  check "blocks aws ec2 describe-instances"       block '{"tool_input":{"command":"aws ec2 describe-instances"}}'                                     block-aws.sh
+  check "blocks aws s3 cp inside pipeline"        block '{"tool_input":{"command":"echo go && aws s3 cp s3://b/k ."}}'                                block-aws.sh
+  check "allows allowed call inside pipeline"     allow '{"tool_input":{"command":"echo go && aws dynamodb scan --table-name dev_asset_table"}}'      block-aws.sh
+  check "blocks sudo aws s3 ls"                   block '{"tool_input":{"command":"sudo aws s3 ls"}}'                                                 block-aws.sh
+  check "allows echo aws s3 ls (string)"          allow '{"tool_input":{"command":"echo \"aws s3 ls\""}}'                                             block-aws.sh
+  AGENTGUARD_AWS_ALLOWED_TABLES="my_table" check "respects AGENTGUARD_AWS_ALLOWED_TABLES override" allow '{"tool_input":{"command":"aws dynamodb scan --table-name my_table"}}' block-aws.sh
+
+  echo ""
   echo "audit-log.sh"
   # Run the installed Claude hook (not source) so the correct log path is used.
   # The source hook writes to ~/.kiro/audit.log when ~/.kiro exists, which would
